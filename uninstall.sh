@@ -40,5 +40,11 @@ rm -f "$HOME/.cache/starship-tokyo_night.toml" \
       "$HOME/.cache/starship-tokyo_night_day.toml"
 ok "Cleared starship caches."
 
+rm -f "$HOME/.config/zellij/themes/tokyo-night.kdl" \
+      "$HOME/.config/zellij/themes/tokyo-night-day.kdl" \
+      "$HOME/.cache/zellij-tokyo-night.kdl" \
+      "$HOME/.cache/zellij-tokyo-night-day.kdl"
+ok "Removed zellij themes and caches."
+
 echo
 ok "Uninstall complete. Open a new shell to drop the hook."

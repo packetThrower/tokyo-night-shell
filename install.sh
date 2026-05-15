@@ -73,7 +73,25 @@ backup_if_exists "$HOME/.config/starship.toml"
 cp "$SCRIPT_DIR/starship/starship.toml" "$HOME/.config/starship.toml"
 ok "Installed ~/.config/starship.toml"
 
-# ─── 4. .zshrc managed block ──────────────────────────────────────────────────
+# ─── 4. Zellij themes ─────────────────────────────────────────────────────────
+# Additive — drop theme files into ~/.config/zellij/themes/ and let the shell
+# wrapper handle activation. The user's own ~/.config/zellij/config.kdl is
+# never touched.
+mkdir -p "$HOME/.config/zellij/themes"
+for theme in tokyo-night tokyo-night-day; do
+  dest="$HOME/.config/zellij/themes/${theme}.kdl"
+  backup_if_exists "$dest"
+  cp "$SCRIPT_DIR/zellij/themes/${theme}.kdl" "$dest"
+  ok "Installed ~/.config/zellij/themes/${theme}.kdl"
+done
+
+if command -v zellij >/dev/null 2>&1; then
+  ok "Zellij: $(zellij --version)"
+else
+  info "Zellij not installed — themes are in place for later (brew install zellij)."
+fi
+
+# ─── 5. .zshrc managed block ──────────────────────────────────────────────────
 touch "$ZSHRC"
 
 if grep -qF "$MARKER_BEGIN" "$ZSHRC"; then

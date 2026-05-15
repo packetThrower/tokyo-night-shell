@@ -1,0 +1,124 @@
+// Tokyo Night Day — tuned darker than canonical Tokyo Night Day so the colors
+// stay readable under WezTerm vibrancy/blur where the wallpaper mixes into the
+// background. Palette mirrors starship.toml's tokyo_night_day variant.
+// Uses Zellij's new "Styling" schema (0.40+) for full UI coverage.
+themes {
+    tokyo-night-day {
+        text_unselected {
+            base       "#2c4d99"
+            background "#e1e2e7"
+            emphasis_0 "#8a4400"
+            emphasis_1 "#005d7a"
+            emphasis_2 "#3d5520"
+            emphasis_3 "#6a1fbf"
+        }
+        text_selected {
+            base       "#2c4d99"
+            background "#c4c8da"
+            emphasis_0 "#8a4400"
+            emphasis_1 "#005d7a"
+            emphasis_2 "#3d5520"
+            emphasis_3 "#6a1fbf"
+        }
+        ribbon_unselected {
+            base       "#e1e2e7"
+            background "#3a4566"
+            emphasis_0 "#c80f4a"
+            emphasis_1 "#e1e2e7"
+            emphasis_2 "#1f5fcc"
+            emphasis_3 "#6a1fbf"
+        }
+        ribbon_selected {
+            base       "#e1e2e7"
+            background "#1f5fcc"
+            emphasis_0 "#c80f4a"
+            emphasis_1 "#8a4400"
+            emphasis_2 "#6a1fbf"
+            emphasis_3 "#3d5520"
+        }
+        table_title {
+            base       "#3d5520"
+            background 0
+            emphasis_0 "#8a4400"
+            emphasis_1 "#005d7a"
+            emphasis_2 "#3d5520"
+            emphasis_3 "#6a1fbf"
+        }
+        table_cell_unselected {
+            base       "#2c4d99"
+            background "#e1e2e7"
+            emphasis_0 "#8a4400"
+            emphasis_1 "#005d7a"
+            emphasis_2 "#3d5520"
+            emphasis_3 "#6a1fbf"
+        }
+        table_cell_selected {
+            base       "#2c4d99"
+            background "#c4c8da"
+            emphasis_0 "#8a4400"
+            emphasis_1 "#005d7a"
+            emphasis_2 "#3d5520"
+            emphasis_3 "#6a1fbf"
+        }
+        list_unselected {
+            base       "#2c4d99"
+            background "#e1e2e7"
+            emphasis_0 "#8a4400"
+            emphasis_1 "#005d7a"
+            emphasis_2 "#3d5520"
+            emphasis_3 "#6a1fbf"
+        }
+        list_selected {
+            base       "#2c4d99"
+            background "#c4c8da"
+            emphasis_0 "#8a4400"
+            emphasis_1 "#005d7a"
+            emphasis_2 "#3d5520"
+            emphasis_3 "#6a1fbf"
+        }
+        frame_selected {
+            base       "#1f5fcc"
+            background 0
+            emphasis_0 "#8a4400"
+            emphasis_1 "#005d7a"
+            emphasis_2 "#6a1fbf"
+            emphasis_3 0
+        }
+        frame_highlight {
+            base       "#8a4400"
+            background 0
+            emphasis_0 "#6a1fbf"
+            emphasis_1 "#8a4400"
+            emphasis_2 "#8a4400"
+            emphasis_3 "#8a4400"
+        }
+        exit_code_success {
+            base       "#3d5520"
+            background 0
+            emphasis_0 "#005d7a"
+            emphasis_1 "#3a4566"
+            emphasis_2 "#6a1fbf"
+            emphasis_3 "#1f5fcc"
+        }
+        exit_code_error {
+            base       "#c80f4a"
+            background 0
+            emphasis_0 "#5f4419"
+            emphasis_1 0
+            emphasis_2 0
+            emphasis_3 0
+        }
+        multiplayer_user_colors {
+            player_1  "#6a1fbf"
+            player_2  "#1f5fcc"
+            player_3  0
+            player_4  "#5f4419"
+            player_5  "#005d7a"
+            player_6  0
+            player_7  "#c80f4a"
+            player_8  0
+            player_9  0
+            player_10 0
+        }
+    }
+}
