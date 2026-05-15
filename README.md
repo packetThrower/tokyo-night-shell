@@ -5,6 +5,12 @@ and [Starship](https://starship.rs/) on macOS — with one trick: the terminal
 chrome and the prompt palette **swap live between dark and day variants when
 you toggle System Settings → Appearance**, no shell restart.
 
+<p align="center">
+  <a href="screenshots/dark_theme.png"><img src="screenshots/dark_theme.png" alt="Dark mode" width="49%"></a>
+  <a href="screenshots/light_theme.png"><img src="screenshots/light_theme.png" alt="Light mode" width="49%"></a>
+</p>
+<p align="center"><sub><i>Same shell, same session — flipped by toggling System Settings → Appearance.</i></sub></p>
+
 ## What's in the box
 
 ```
