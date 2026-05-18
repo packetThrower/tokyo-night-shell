@@ -23,6 +23,7 @@ local palettes = {
     green       = '#9ece6a',
     yellow      = '#e0af68',
     red         = '#f7768e',
+    orange      = '#ff9e64',
     tab_bar_bg  = 'rgba(26, 27, 38, 0.0)',
     tab_inactive= 'rgba(26, 27, 38, 0.35)',
   },
@@ -39,6 +40,7 @@ local palettes = {
     green       = '#587539',
     yellow      = '#8c6c3e',
     red         = '#f52a65',
+    orange      = '#b15c00',
     tab_bar_bg  = 'rgba(225, 226, 231, 0.0)',
     tab_inactive= 'rgba(225, 226, 231, 0.45)',
   },
@@ -56,8 +58,8 @@ local function colors_for(p)
     cursor_bg = p.cyan,
     cursor_border = p.cyan,
     cursor_fg = p.bg,
-    selection_bg = p.bg_highlight,
-    selection_fg = p.fg,
+    selection_bg = p.orange,
+    selection_fg = p.bg,
     split = p.bg_highlight,
     tab_bar = {
       -- Solid colors here — rgba lets the vibrancy/blur bleed through and washes
