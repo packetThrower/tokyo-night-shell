@@ -145,8 +145,8 @@ config.macos_window_background_blur = 32
 config.window_padding = {
   left = 18, right = 18, top = 8, bottom = 10,
 }
-config.initial_cols = 160
-config.initial_rows = 45
+config.initial_cols = 100
+config.initial_rows = 30
 config.window_close_confirmation = 'NeverPrompt'
 config.adjust_window_size_when_changing_font_size = false
 config.audible_bell = 'Disabled'
