@@ -135,7 +135,18 @@ starship-resync
 
 The "focus" color — used for the prompt `❯`, the WezTerm active tab, and
 Zellij's active ribbon + pane border — can be swapped to any palette color.
-Three small edits, one per tool:
+
+**Quick path:**
+
+```bash
+./swap-accent.sh orange
+```
+
+Edits both the repo source and the installed configs (so install.sh stays
+idempotent) and prints the per-tool effect. Accepts `blue`, `cyan`,
+`magenta`, `green`, `yellow`, `red`, `orange`.
+
+**Manual path** — three small edits, one per tool:
 
 - **WezTerm** (`wezterm/wezterm.lua`): change `local ACCENT_NAME = 'blue'` near
   the top of the file to `'orange'`, `'magenta'`, `'green'`, `'cyan'`,
