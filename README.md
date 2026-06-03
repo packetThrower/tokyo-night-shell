@@ -83,14 +83,23 @@ Starship can't read `defaults` itself, so:
 
 ## Install
 
+**Via Homebrew (recommended):**
+
+```bash
+brew install packetthrower/tap/tokyo-night-shell
+tokyo-night-shell init
+```
+
+(Add `--HEAD` to track the latest commit on `main` instead of the most
+recent tagged release.)
+
+**From source:**
+
 ```bash
 git clone <this-repo> tokyo-night-shell
 cd tokyo-night-shell
 ./bin/tokyo-night-shell init
 ```
-
-(Or `brew install packetthrower/tap/tokyo-night-shell && tokyo-night-shell init`
-once the Homebrew formula lands.)
 
 `init`:
 
