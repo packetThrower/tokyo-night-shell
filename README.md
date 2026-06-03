@@ -16,8 +16,7 @@ no shell restart. Zellij joins in at session-start (it can't live-swap mid-sessi
 
 ```
 tokyo-night-shell/
-├── install.sh                   one-shot installer (idempotent)
-├── uninstall.sh                 restores backups, removes the .zshrc block
+├── bin/tokyo-night-shell        CLI: init / uninstall / swap subcommands
 ├── wezterm/wezterm.lua          WezTerm config
 ├── starship/starship.toml       Starship config
 ├── zellij/themes/               Zellij theme files (dark + day)
@@ -87,10 +86,13 @@ Starship can't read `defaults` itself, so:
 ```bash
 git clone <this-repo> tokyo-night-shell
 cd tokyo-night-shell
-./install.sh
+./bin/tokyo-night-shell init
 ```
 
-The installer:
+(Or `brew install packetthrower/tap/tokyo-night-shell && tokyo-night-shell init`
+once the Homebrew formula lands.)
+
+`init`:
 
 - Installs WezTerm, Starship, and JetBrainsMono Nerd Font via Homebrew if any
   are missing
@@ -104,8 +106,7 @@ The installer:
   # <<< tokyo-night-shell init <<<
   ```
 
-  so re-running the installer cleanly replaces the block instead of appending
-  duplicates
+  so re-running `init` cleanly replaces the block instead of appending duplicates
 
 After install, run `exec zsh` in any open shell — or just open a new WezTerm
 window.
@@ -139,18 +140,20 @@ Zellij's active ribbon + pane border — can be swapped to any palette color.
 **Quick path:**
 
 ```bash
-./swap-accent.sh orange            # change your installed configs only
-./swap-accent.sh --repo orange     # also rewrite the repo source (for a fork/PR)
+tokyo-night-shell swap orange         # change your installed configs only
+tokyo-night-shell swap --repo orange  # also rewrite the repo source (for a fork/PR)
 ```
 
 Default target is just your installed dot files (`~/.wezterm.lua`,
 `~/.config/starship.toml`, `~/.config/zellij/themes/*.kdl`) — the source
 files in this repo stay untouched, so re-cloning or pulling upstream
-doesn't fight your accent choice. Caveat: running `./install.sh` again
-will copy the repo's accent back over your installed configs, so if you
-want your swap to survive an install you'll need `--repo` too (or to commit
-the source change to your own fork). Accepts `blue`, `cyan`, `magenta`,
-`green`, `yellow`, `red`, `orange`.
+doesn't fight your accent choice. Caveat: re-running `tokyo-night-shell init`
+will copy the repo's accent back over your installed configs, so if you want
+your swap to survive an init you'll need `--repo` too (or to commit the
+source change to your own fork). The `--repo` flag is only available when
+running from a git clone — in a brew install, fork the tap to change the
+shipped default. Accepts `blue`, `cyan`, `magenta`, `green`, `yellow`,
+`red`, `orange`.
 
 **Manual path** — three small edits, one per tool:
 
@@ -166,15 +169,16 @@ the source change to your own fork). Accepts `blue`, `cyan`, `magenta`,
   hex lines to edit and the alternate values. Restart any running session
   (`zellij ka && exec zsh`) to apply.
 
-After editing any config in the package, re-run `./install.sh`. After editing
-the installed configs directly (`~/.wezterm.lua`, `~/.config/starship.toml`,
-`~/.config/zellij/config.kdl`), run `starship-resync` or `zellij-resync` in
-your shell to rebuild the palette caches.
+After editing any config in the package, re-run `tokyo-night-shell init`.
+After editing the installed configs directly (`~/.wezterm.lua`,
+`~/.config/starship.toml`, `~/.config/zellij/config.kdl`), run
+`starship-resync` or `zellij-resync` in your shell to rebuild the palette
+caches.
 
 ## Uninstall
 
 ```bash
-./uninstall.sh
+tokyo-night-shell uninstall
 ```
 
 Restores the **most recent** timestamped backups of `~/.wezterm.lua` and
