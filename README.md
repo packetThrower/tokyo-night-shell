@@ -129,6 +129,25 @@ starship-resync
 | Tweak day-palette brightness | Values under `[palettes.tokyo_night_day]` in `starship/starship.toml` |
 | Adjust zellij colors | Hex values in `zellij/themes/tokyo-night.kdl` and `zellij/themes/tokyo-night-day.kdl` |
 | Less frequent appearance polling | Bump the `3` in `(( now - __starship_last_appearance_check < 3 ))` inside `shell/zshrc-init.zsh` |
+| Swap the focus accent (prompt ❯, active tab, Zellij ribbon) | See **Accent swap** below |
+
+### Accent swap
+
+The "focus" color — used for the prompt `❯`, the WezTerm active tab, and
+Zellij's active ribbon + pane border — can be swapped to any palette color.
+Three small edits, one per tool:
+
+- **WezTerm** (`wezterm/wezterm.lua`): change `local ACCENT_NAME = 'blue'` near
+  the top of the file to `'orange'`, `'magenta'`, `'green'`, `'cyan'`,
+  `'yellow'`, or `'red'`. Reloads live.
+- **Starship** (`starship/starship.toml`): change the `accent = "#..."` line
+  in each palette block — one in `[palettes.tokyo_night]`, one in
+  `[palettes.tokyo_night_day]`. Hex variants are listed in the comment above
+  the palettes. Run `starship-resync` to apply.
+- **Zellij** (`zellij/themes/tokyo-night.kdl` + `tokyo-night-day.kdl`): each
+  theme file has a "FOCUS ACCENT SWAP" comment at the top listing the two
+  hex lines to edit and the alternate values. Restart any running session
+  (`zellij ka && exec zsh`) to apply.
 
 After editing any config in the package, re-run `./install.sh`. After editing
 the installed configs directly (`~/.wezterm.lua`, `~/.config/starship.toml`,

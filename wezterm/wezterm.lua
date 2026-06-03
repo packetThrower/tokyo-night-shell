@@ -46,6 +46,12 @@ local palettes = {
   },
 }
 
+-- Focus accent — the palette color used for the active tab background and the
+-- new-tab button. Set this to any palette field name to swap: 'blue' (default),
+-- 'cyan', 'magenta', 'green', 'yellow', 'red', 'orange'. Day-palette tints of
+-- the same names are picked up automatically when the appearance flips.
+local ACCENT_NAME = 'blue'
+
 local function theme_for(appearance)
   if appearance and appearance:find('Dark') then
     return 'Tokyo Night', palettes.dark
@@ -69,7 +75,7 @@ local function colors_for(p)
       -- bar so the active one is the only visual weight in the row.
       background = p.bg_dim,
       active_tab = {
-        bg_color = p.blue,
+        bg_color = p[ACCENT_NAME],
         fg_color = p.bg,
         intensity = 'Bold',
       },
@@ -84,7 +90,7 @@ local function colors_for(p)
       },
       new_tab = {
         bg_color = p.bg_dim,
-        fg_color = p.blue,
+        fg_color = p[ACCENT_NAME],
       },
       new_tab_hover = {
         bg_color = p.bg_highlight,

@@ -2,6 +2,18 @@
 // stay readable under WezTerm vibrancy/blur where the wallpaper mixes into the
 // background. Palette mirrors starship.toml's tokyo_night_day variant.
 // Uses Zellij's new "Styling" schema (0.40+) for full UI coverage.
+//
+// FOCUS ACCENT SWAP: the accent color (#1f5fcc — tuned blue) appears in
+// exactly two places below — `ribbon_selected.background` (active mode chip
+// in the status bar) and `frame_selected.base` (active pane border). To
+// swap both, edit those two lines to one of (day-tuned variants):
+//   blue    "#1f5fcc"   (default)
+//   cyan    "#005d7a"
+//   magenta "#6a1fbf"
+//   green   "#3d5520"
+//   yellow  "#5f4419"
+//   red     "#c80f4a"
+//   orange  "#8a4400"
 themes {
     tokyo-night-day {
         text_unselected {

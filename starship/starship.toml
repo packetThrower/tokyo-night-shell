@@ -30,6 +30,9 @@ $line_break\
 right_format = "$time"
 
 # ─── Tokyo Night palettes (matches WezTerm) ───────────────────────────────────
+# Focus accent (prompt ❯ and directory) is `accent` in each palette below.
+# Change to swap — e.g. accent = "#ff9e64" (dark) and "#8a4400" (day) for
+# orange. Other named colors are kept for semantic uses (lua=blue, etc.).
 [palettes.tokyo_night]
 fg           = "#c0caf5"
 fg_dim       = "#a9b1d6"
@@ -42,6 +45,7 @@ green        = "#9ece6a"
 yellow       = "#e0af68"
 orange       = "#ff9e64"
 red          = "#f7768e"
+accent       = "#7aa2f7"
 
 # Darker than canonical Tokyo Night Day: tuned for translucent terminals
 # where vibrancy+blur mix the wallpaper into the bg.
@@ -57,17 +61,18 @@ green        = "#3d5520"
 yellow       = "#5f4419"
 orange       = "#8a4400"
 red          = "#c80f4a"
+accent       = "#1f5fcc"
 
 # ─── Modules ──────────────────────────────────────────────────────────────────
 
 [character]
-success_symbol = "[❯](bold blue)"
+success_symbol = "[❯](bold accent)"
 error_symbol   = "[❯](bold red)"
 vimcmd_symbol  = "[❮](bold green)"
 
 [directory]
 format            = "[$path]($style)[$read_only]($read_only_style) "
-style             = "bold blue"
+style             = "bold accent"
 read_only         = " "
 read_only_style   = "red"
 truncation_length = 3
