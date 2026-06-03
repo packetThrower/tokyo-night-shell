@@ -139,12 +139,18 @@ Zellij's active ribbon + pane border — can be swapped to any palette color.
 **Quick path:**
 
 ```bash
-./swap-accent.sh orange
+./swap-accent.sh orange            # change your installed configs only
+./swap-accent.sh --repo orange     # also rewrite the repo source (for a fork/PR)
 ```
 
-Edits both the repo source and the installed configs (so install.sh stays
-idempotent) and prints the per-tool effect. Accepts `blue`, `cyan`,
-`magenta`, `green`, `yellow`, `red`, `orange`.
+Default target is just your installed dot files (`~/.wezterm.lua`,
+`~/.config/starship.toml`, `~/.config/zellij/themes/*.kdl`) — the source
+files in this repo stay untouched, so re-cloning or pulling upstream
+doesn't fight your accent choice. Caveat: running `./install.sh` again
+will copy the repo's accent back over your installed configs, so if you
+want your swap to survive an install you'll need `--repo` too (or to commit
+the source change to your own fork). Accepts `blue`, `cyan`, `magenta`,
+`green`, `yellow`, `red`, `orange`.
 
 **Manual path** — three small edits, one per tool:
 

@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 # Swap the focus accent across WezTerm, Starship, and Zellij in one shot.
-# Edits both the repo source and the installed configs so they stay in sync.
+# Default: edits only the installed dot files (the typical user case — your
+# install was a one-shot copy from this repo, swap-accent only changes your
+# live configs). Pass --repo to also rewrite the repo's source files, for
+# when you want to commit your accent choice to a fork or open a PR upstream.
 #
 # Usage:
-#   ./swap-accent.sh <color>
+#   ./swap-accent.sh <color>          # installed configs only
+#   ./swap-accent.sh --repo <color>   # also rewrite repo source
 #
 # Colors: blue cyan magenta green yellow red orange
 set -euo pipefail
@@ -20,10 +24,12 @@ _mode() { stat -f '%Lp' "$1" 2>/dev/null || stat -c '%a' "$1"; }
 
 usage() {
   cat >&2 <<EOF
-Usage: $(basename "$0") <color>
+Usage: $(basename "$0") [--repo] <color>
 
 Swaps the focus accent (prompt ❯, WezTerm active tab, Zellij active ribbon
-and pane border) to one of the named Tokyo Night palette colors.
+and pane border) to one of the named Tokyo Night palette colors. Default
+target is your installed dot files only — pass --repo to also rewrite the
+repo source (intended for forks / upstream PRs).
 
   blue     #7aa2f7 / #1f5fcc   (default)
   cyan     #7dcfff / #005d7a
@@ -36,7 +42,22 @@ EOF
   exit 1
 }
 
-case "${1:-}" in
+EDIT_REPO=false
+COLOR=""
+for arg in "$@"; do
+  case "$arg" in
+    --repo)        EDIT_REPO=true ;;
+    -h|--help)     usage ;;
+    -*)            fail "Unknown flag: $arg" ;;
+    *)
+      [[ -n "$COLOR" ]] && fail "Multiple colors given: $COLOR and $arg"
+      COLOR="$arg"
+      ;;
+  esac
+done
+[[ -n "$COLOR" ]] || usage
+
+case "$COLOR" in
   blue)    DARK="#7aa2f7"; DAY="#1f5fcc" ;;
   cyan)    DARK="#7dcfff"; DAY="#005d7a" ;;
   magenta) DARK="#bb9af7"; DAY="#6a1fbf" ;;
@@ -44,11 +65,8 @@ case "${1:-}" in
   yellow)  DARK="#e0af68"; DAY="#5f4419" ;;
   red)     DARK="#f7768e"; DAY="#c80f4a" ;;
   orange)  DARK="#ff9e64"; DAY="#8a4400" ;;
-  ""|-h|--help) usage ;;
-  *)       fail "Unknown color: $1 (run with no args for the list)" ;;
+  *)       fail "Unknown color: $COLOR (run with no args for the list)" ;;
 esac
-
-COLOR="$1"
 
 # WezTerm: rewrite `local ACCENT_NAME = '<color>'` near the top.
 swap_wezterm() {
@@ -101,13 +119,15 @@ swap_zellij() {
 echo "Swapping accent → ${COLOR} (dark ${DARK}, day ${DAY})"
 echo
 
-info "Repo source"
-swap_wezterm  "$SCRIPT_DIR/wezterm/wezterm.lua"
-swap_starship "$SCRIPT_DIR/starship/starship.toml"
-swap_zellij   "$SCRIPT_DIR/zellij/themes/tokyo-night.kdl"     "$DARK"
-swap_zellij   "$SCRIPT_DIR/zellij/themes/tokyo-night-day.kdl" "$DAY"
+if $EDIT_REPO; then
+  info "Repo source"
+  swap_wezterm  "$SCRIPT_DIR/wezterm/wezterm.lua"
+  swap_starship "$SCRIPT_DIR/starship/starship.toml"
+  swap_zellij   "$SCRIPT_DIR/zellij/themes/tokyo-night.kdl"     "$DARK"
+  swap_zellij   "$SCRIPT_DIR/zellij/themes/tokyo-night-day.kdl" "$DAY"
+  echo
+fi
 
-echo
 info "Installed configs"
 swap_wezterm  "$HOME/.wezterm.lua"
 swap_starship "$HOME/.config/starship.toml"
@@ -119,3 +139,10 @@ echo "Applied. Effects:"
 echo "  • WezTerm  — reloads live (any open window)"
 echo "  • Starship — refreshes on the next prompt (cache regen via mtime)"
 echo "  • Zellij   — restart sessions to apply:  zellij ka && zellij"
+
+if ! $EDIT_REPO; then
+  echo
+  echo "  Note: repo source unchanged. Running ./install.sh would revert your"
+  echo "  installed configs to the repo's accent. Pass --repo to also rewrite"
+  echo "  the source (for a fork or upstream PR)."
+fi
