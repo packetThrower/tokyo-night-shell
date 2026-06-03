@@ -62,12 +62,15 @@ local function colors_for(p)
     selection_fg = p.bg,
     split = p.bg_highlight,
     tab_bar = {
-      -- Solid colors here — rgba lets the vibrancy/blur bleed through and washes
-      -- the tabs out into a frosted-glass white. Opaque chrome, translucent body.
-      background = p.bg,
+      -- Solid colors here — rgba lets vibrancy bleed through and washes the
+      -- tabs out into a frosted-glass white. Active tab uses the blue accent
+      -- (matches Starship ❯, Zellij frame_selected) for unambiguous "this is
+      -- focused" in both light and dark mode. Inactive tabs blend into the
+      -- bar so the active one is the only visual weight in the row.
+      background = p.bg_dim,
       active_tab = {
-        bg_color = p.bg,
-        fg_color = p.blue,
+        bg_color = p.blue,
+        fg_color = p.bg,
         intensity = 'Bold',
       },
       inactive_tab = {
@@ -80,7 +83,7 @@ local function colors_for(p)
         italic = false,
       },
       new_tab = {
-        bg_color = p.bg,
+        bg_color = p.bg_dim,
         fg_color = p.blue,
       },
       new_tab_hover = {
@@ -184,7 +187,7 @@ config.use_fancy_tab_bar = true
 config.tab_bar_at_bottom = false
 config.hide_tab_bar_if_only_one_tab = false
 config.show_new_tab_button_in_tab_bar = true
-config.tab_max_width = 36
+config.tab_max_width = 50
 
 -- React to macOS Appearance changes (System Settings → Appearance, or auto).
 wezterm.on('window-config-reloaded', function(window)
@@ -239,7 +242,7 @@ local function icon_for(process)
   return icons[process] or nf.cod_terminal
 end
 
--- Tab title: " <icon>  <process|cwd>  "
+-- Tab title: " <icon>  <process|cwd>" padded to a minimum cell width.
 wezterm.on('format-tab-title', function(tab, _, _, _, _, max_width)
   local pane = tab.active_pane
   local process = (pane.foreground_process_name or ''):match('([^/\\]+)$') or 'shell'
@@ -261,7 +264,12 @@ wezterm.on('format-tab-title', function(tab, _, _, _, _, max_width)
     end
   end
 
-  local title = string.format('  %s  %s  ', icon, label)
+  -- Fancy tab bar sizes tabs to their content (up to tab_max_width), so to
+  -- get visibly wider tabs we have to make the content itself wider. Pad
+  -- short titles to a minimum cell width; the trailing padding also buffers
+  -- the close X away from the label text so it's harder to misclick.
+  local title = string.format('  %s  %s', icon, label)
+  title = wezterm.pad_right(title, 28)
   if #title > max_width then
     title = wezterm.truncate_right(title, max_width - 1) .. '…'
   end
@@ -297,7 +305,7 @@ wezterm.on('update-right-status', function(window, _)
   table.insert(cells, { Foreground = { Color = palette.comment } })
   table.insert(cells, { Text = '   ' })
   table.insert(cells, { Foreground = { Color = palette.fg_dim } })
-  table.insert(cells, { Text = nf.md_clock_outline .. ' ' .. wezterm.strftime('%a %b %-d  %H:%M') })
+  table.insert(cells, { Text = nf.md_clock_outline .. ' ' .. wezterm.strftime('%b %-d  %H:%M') })
   table.insert(cells, { Text = '  ' })
 
   window:set_right_status(wezterm.format(cells))
