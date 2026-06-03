@@ -227,8 +227,13 @@ _swap_zellij() {
 }
 
 _swap_usage() {
+  local flag_syntax="" flag_doc=""
+  if in_git_clone; then
+    flag_syntax=" [--repo]"
+    flag_doc=$'\n  --repo   Also rewrite the repo source files (for forks / upstream PRs).'
+  fi
   cat >&2 <<EOF
-Usage: tokyo-night-shell swap [--repo] <color>
+Usage: tokyo-night-shell swap${flag_syntax} <color>
 
 Swaps the focus accent (prompt ❯, WezTerm active tab, Zellij active ribbon
 and pane border). Edits only installed configs by default.
@@ -239,14 +244,8 @@ and pane border). Edits only installed configs by default.
   green    #9ece6a / #3d5520
   yellow   #e0af68 / #5f4419
   red      #f7768e / #c80f4a
-  orange   #ff9e64 / #8a4400
+  orange   #ff9e64 / #8a4400${flag_doc}
 EOF
-  if in_git_clone; then
-    cat >&2 <<EOF
-
-  --repo   Also rewrite the repo source files (for forks / upstream PRs).
-EOF
-  fi
   exit 1
 }
 
