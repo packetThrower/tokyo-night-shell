@@ -140,6 +140,7 @@ starship-resync
 | Adjust zellij colors | Hex values in `zellij/themes/tokyo-night.kdl` and `zellij/themes/tokyo-night-day.kdl` |
 | Less frequent appearance polling | Bump the `3` in `(( now - __starship_last_appearance_check < 3 ))` inside `shell/zshrc-init.zsh` |
 | Swap the focus accent (prompt ❯, active tab, Zellij ribbon) | See **Accent swap** below |
+| Force dark/day without changing macOS Appearance | `tokyo-night-shell mode dark` / `mode day` / `mode auto` (auto = follow the OS again) |
 
 ### Accent swap
 

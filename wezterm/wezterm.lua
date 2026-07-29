@@ -52,8 +52,22 @@ local palettes = {
 -- the same names are picked up automatically when the appearance flips.
 local ACCENT_NAME = 'blue'
 
+-- Force-mode override — `tokyo-night-shell mode dark|day` writes this file;
+-- absent = follow macOS Appearance. The CLI touches ~/.wezterm.lua after
+-- writing it, so this config reloads and repaints immediately.
+local function forced_mode()
+  local dir = os.getenv('XDG_CACHE_HOME') or (wezterm.home_dir .. '/.cache')
+  local f = io.open(dir .. '/tokyo-night-mode', 'r')
+  if not f then return nil end
+  local m = (f:read('*l') or ''):match('^%s*(%S*)')
+  f:close()
+  if m == 'dark' or m == 'day' then return m end
+  return nil
+end
+
 local function theme_for(appearance)
-  if appearance and appearance:find('Dark') then
+  local forced = forced_mode()
+  if forced == 'dark' or (forced == nil and appearance and appearance:find('Dark')) then
     return 'Tokyo Night', palettes.dark
   end
   return 'Tokyo Night Day', palettes.day

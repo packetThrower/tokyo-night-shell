@@ -309,6 +309,37 @@ cmd_swap() {
   fi
 }
 
+# ─── cmd: mode ───────────────────────────────────────────────────────────────
+# Force dark/day without touching macOS Appearance. State lives in one file;
+# the zsh hook, zellij wrapper, and wezterm.lua all read it.
+cmd_mode() {
+  local dir="${XDG_CACHE_HOME:-$HOME/.cache}"
+  local f="$dir/tokyo-night-mode"
+  case "${1:-}" in
+    dark|day)
+      mkdir -p "$dir"
+      printf '%s\n' "$1" > "$f"
+      ok "Mode forced to $1."
+      ;;
+    auto)
+      rm -f "$f"
+      ok "Mode set to auto (follows macOS Appearance)."
+      ;;
+    "")
+      [[ -f "$f" ]] && cat "$f" || echo "auto"
+      return 0
+      ;;
+    *) fail "Usage: tokyo-night-shell mode [dark|day|auto]  (no arg prints current)" ;;
+  esac
+  # WezTerm only watches ~/.wezterm.lua for reloads; bump its mtime so open
+  # windows repaint now instead of waiting for the next appearance event.
+  [[ -f "$HOME/.wezterm.lua" ]] && touch "$HOME/.wezterm.lua"
+  echo
+  echo "  • WezTerm  — repaints now"
+  echo "  • Starship — next prompt (within the ~3s debounce)"
+  echo "  • Zellij   — new sessions (restart running ones to apply)"
+}
+
 # ─── Dispatch ────────────────────────────────────────────────────────────────
 usage() {
   cat <<EOF
@@ -318,6 +349,7 @@ Usage:
   tokyo-night-shell init               Install configs into \$HOME, wire ~/.zshrc.
   tokyo-night-shell uninstall          Restore backups, remove the .zshrc block.
   tokyo-night-shell swap <color>       Swap the focus accent. Run with no color for the list.
+  tokyo-night-shell mode [dark|day|auto]  Force dark/day regardless of macOS Appearance; no arg prints current.
   tokyo-night-shell --version
   tokyo-night-shell --help
 
@@ -329,6 +361,7 @@ case "${1:-}" in
   init)             shift; cmd_init "$@" ;;
   uninstall)        shift; cmd_uninstall "$@" ;;
   swap)             shift; cmd_swap "$@" ;;
+  mode)             shift; cmd_mode "$@" ;;
   -v|--version)     echo "$VERSION" ;;
   -h|--help|"")     usage ;;
   *)                fail "Unknown command: $1 (try 'tokyo-night-shell --help')" ;;

@@ -4,6 +4,19 @@
 # Appearance takes effect within one prompt, no restart needed.
 zmodload zsh/datetime  # exposes $EPOCHSECONDS
 
+# Dark or day? Honors the force-mode file written by `tokyo-night-shell mode
+# dark|day`; absent file (or `mode auto`) = follow macOS Appearance.
+__tokyo_night_is_dark() {
+  local f="${XDG_CACHE_HOME:-$HOME/.cache}/tokyo-night-mode"
+  if [[ -f $f ]]; then
+    case "$(<$f)" in
+      dark) return 0 ;;
+      day)  return 1 ;;
+    esac
+  fi
+  defaults read -g AppleInterfaceStyle 2>/dev/null | grep -qi dark
+}
+
 __starship_setup_caches() {
   local src="$HOME/.config/starship.toml"
   local dir="${XDG_CACHE_HOME:-$HOME/.cache}"
@@ -24,7 +37,7 @@ __starship_pick_palette() {
   (( now - __starship_last_appearance_check < 3 )) && return
   __starship_last_appearance_check=$now
   local dir="${XDG_CACHE_HOME:-$HOME/.cache}"
-  if defaults read -g AppleInterfaceStyle 2>/dev/null | grep -qi dark; then
+  if __tokyo_night_is_dark; then
     export STARSHIP_CONFIG="$dir/starship-tokyo_night.toml"
   else
     export STARSHIP_CONFIG="$dir/starship-tokyo_night_day.toml"
@@ -76,7 +89,7 @@ zellij() {
   local dir="${XDG_CACHE_HOME:-$HOME/.cache}"
   [[ -f "$dir/zellij-tokyo-night.kdl" && -f "$dir/zellij-tokyo-night-day.kdl" ]] || __zellij_setup_caches
   local variant=tokyo-night
-  defaults read -g AppleInterfaceStyle 2>/dev/null | grep -qi dark || variant=tokyo-night-day
+  __tokyo_night_is_dark || variant=tokyo-night-day
   ZELLIJ_CONFIG_FILE="$dir/zellij-${variant}.kdl" command zellij "$@"
 }
 
