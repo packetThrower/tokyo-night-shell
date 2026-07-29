@@ -315,11 +315,13 @@ cmd_swap() {
 cmd_mode() {
   local dir="${XDG_CACHE_HOME:-$HOME/.cache}"
   local f="$dir/tokyo-night-mode"
-  case "${1:-}" in
+  local want="${1:-}"
+  [[ "$want" == light ]] && want=day  # macOS says Light, the theme says Day
+  case "$want" in
     dark|day)
       mkdir -p "$dir"
-      printf '%s\n' "$1" > "$f"
-      ok "Mode forced to $1."
+      printf '%s\n' "$want" > "$f"
+      ok "Mode forced to $want."
       ;;
     auto)
       rm -f "$f"
@@ -329,7 +331,7 @@ cmd_mode() {
       [[ -f "$f" ]] && cat "$f" || echo "auto"
       return 0
       ;;
-    *) fail "Usage: tokyo-night-shell mode [dark|day|auto]  (no arg prints current)" ;;
+    *) fail "Usage: tokyo-night-shell mode [dark|day|light|auto]  (no arg prints current; light = day)" ;;
   esac
   # WezTerm only watches ~/.wezterm.lua for reloads; bump its mtime so open
   # windows repaint now instead of waiting for the next appearance event.
