@@ -1,189 +1,191 @@
 # Tokyo Night Shell
 
-A coordinated **Tokyo Night** theme for [WezTerm](https://wezfurlong.org/wezterm/),
-[Starship](https://starship.rs/), and [Zellij](https://zellij.dev/) on macOS
-— with one trick: the terminal chrome and the prompt palette **swap live
-between dark and day variants when you toggle System Settings → Appearance**,
-no shell restart. Zellij joins in at session-start (it can't live-swap mid-session).
+A Tokyo Night theme for [WezTerm](https://wezfurlong.org/wezterm/),
+[Starship](https://starship.rs/), and [Zellij](https://zellij.dev/) that
+follows the macOS light/dark setting. Toggle Appearance in System Settings
+and the terminal chrome, prompt, and multiplexer all flip between the dark
+and day palettes within a few seconds. No restarts, no re-sourcing.
 
 <p align="center">
   <a href="screenshots/dark_theme.png"><img src="screenshots/dark_theme.png" alt="Dark mode" width="49%"></a>
   <a href="screenshots/light_theme.png"><img src="screenshots/light_theme.png" alt="Light mode" width="49%"></a>
 </p>
-<p align="center"><sub><i>Same shell, same session — flipped by toggling System Settings → Appearance.</i></sub></p>
+<p align="center"><sub><i>Same shell, same session. The only thing that changed is System Settings → Appearance.</i></sub></p>
 
-## What's in the box
+## Contents
 
-```
-tokyo-night-shell/
-├── bin/tokyo-night-shell        CLI: init / uninstall / swap subcommands
-├── wezterm/wezterm.lua          WezTerm config
-├── starship/starship.toml       Starship config
-├── zellij/themes/               Zellij theme files (dark + day)
-└── shell/zshrc-init.zsh         zsh hook that swaps palettes on Appearance change
-```
-
-### WezTerm (`wezterm/wezterm.lua`)
-
-- Tokyo Night palette + Tokyo Night Day, picked at config-load via
-  `wezterm.gui.get_appearance()` and live-swapped on a
-  `window-config-reloaded` event
-- JetBrainsMono Nerd Font with ligatures, `freetype_render_target = 'HorizontalLcd'`
-- macOS vibrancy: `window_background_opacity = 0.82`, `macos_window_background_blur = 32`
-- Fancy tab bar wired to `config.window_frame` so Nerd-Font process icons
-  render in tab titles (uses an `icon_for(process)` table for `nvim`, `git`,
-  `node`, `python`, `docker`, `claude`, etc.)
-- Right-status line: workspace · battery · clock
-- macOS-friendly keys: `⌘D` / `⌘⇧D` split, `⌘⌥←/→/↑/↓` navigate, `⌘↵` zoom,
-  `⌘K` clear, `⌘⇧P` command palette
-- Inactive-pane HSB dimming so the focused split pops
-
-### Starship (`starship/starship.toml`)
-
-- Two-line prompt framed by subtle `╭─` / `╰─` brackets
-- Two palettes defined: `tokyo_night` and `tokyo_night_day`. The day palette is
-  **darker than the canonical Tokyo Night Day** — tuned for translucent
-  terminals where vibrancy mixes wallpaper into the background and washes out
-  the official editor colors
-- Semantic per-language colors (node green, rust orange, go cyan, lua blue,
-  python yellow, ruby red, deno cyan, bun magenta, php purple)
-- Compact git status with directional ahead/behind markers
-- `right_format` shows the time, dim
-- `❯` flips between blue (success), red (last-command failure), and `❮` green
-  (vim normal mode if you use zsh-vi-mode)
-
-### Zellij (`zellij/themes/`)
-
-- Two theme files dropped into `~/.config/zellij/themes/` — `tokyo-night.kdl`
-  and `tokyo-night-day.kdl`, palettes matched to WezTerm so panes, status
-  bar, and mode chrome line up with the terminal
-- Activation goes through a `zellij` shell wrapper (in `zshrc-init.zsh`): on
-  launch it reads `defaults read -g AppleInterfaceStyle`, picks the matching
-  variant, and points zellij at a cached copy of your `~/.config/zellij/config.kdl`
-  with `theme "…"` patched in — your real config is never touched
-- Zellij has no native live-swap, so a running session keeps the theme it
-  was started with. Toggle Appearance, then start a new session (or restart
-  the existing one with `zellij kill-session`)
-
-If you'd rather not use the wrapper, add `theme "tokyo-night"` (or
-`tokyo-night-day`) to your `~/.config/zellij/config.kdl` directly and skip
-the auto-switch.
-
-### Appearance hook (`shell/zshrc-init.zsh`)
-
-Starship can't read `defaults` itself, so:
-
-1. On shell start, two cache files are generated from the source toml
-   (`~/.cache/starship-tokyo_night.toml` and `…tokyo_night_day.toml`) — one per
-   palette
-2. A `precmd` hook polls `defaults read -g AppleInterfaceStyle` and points
-   `STARSHIP_CONFIG` at the appropriate cache
-3. The check is debounced to once per 3 seconds (using `$EPOCHSECONDS`), so
-   rapid prompts skip it entirely
+- [Install](#install)
+- [How the switching works](#how-the-switching-works)
+- [What you get](#what-you-get)
+- [Commands](#commands)
+- [Customizing](#customizing)
+- [Uninstall](#uninstall)
+- [Notes and limitations](#notes-and-limitations)
 
 ## Install
 
-**Via Homebrew (recommended):**
+With Homebrew:
 
 ```bash
 brew install packetthrower/tap/tokyo-night-shell
 tokyo-night-shell init
 ```
 
-(Add `--HEAD` to track the latest commit on `main` instead of the most
-recent tagged release.)
+Add `--HEAD` to the install if you want the latest commit on `main` instead
+of the last tagged release.
 
-**From source:**
+Or from a clone:
 
 ```bash
-git clone <this-repo> tokyo-night-shell
+git clone https://github.com/packetThrower/tokyo-night-shell.git
 cd tokyo-night-shell
 ./bin/tokyo-night-shell init
 ```
 
-`init`:
+Either way, `init` does the actual setup. It:
 
-- Installs WezTerm, Starship, and JetBrainsMono Nerd Font via Homebrew if any
-  are missing
-- Timestamp-backs-up any existing `~/.wezterm.lua` and `~/.config/starship.toml`
-  before overwriting (look for `*.bak.YYYYMMDD-HHMMSS` next to the originals)
-- Appends a managed block to `~/.zshrc`, bracketed by
+- installs WezTerm, Starship, and the JetBrainsMono Nerd Font through
+  Homebrew if they're missing
+- backs up any existing `~/.wezterm.lua` and `~/.config/starship.toml` with
+  a timestamp suffix (`*.bak.YYYYMMDD-HHMMSS`) before overwriting them
+- adds a block to your `~/.zshrc` between `# >>> tokyo-night-shell init >>>`
+  and `# <<< tokyo-night-shell init <<<` markers. Running `init` again
+  replaces the block rather than stacking duplicates.
 
-  ```
-  # >>> tokyo-night-shell init >>>
-  ...
-  # <<< tokyo-night-shell init <<<
-  ```
+Then run `exec zsh`, or open a new WezTerm window.
 
-  so re-running `init` cleanly replaces the block instead of appending duplicates
+To check that it worked, toggle System Settings → Appearance. The prompt
+should switch palettes within about 3 seconds. If you're impatient, run
+`starship-resync` to force it.
 
-After install, run `exec zsh` in any open shell — or just open a new WezTerm
-window.
+## How the switching works
 
-## Verify
+WezTerm handles itself. It picks a palette at startup with
+`wezterm.gui.get_appearance()` and re-checks whenever its config reloads,
+so it reacts to Appearance changes on its own.
 
-Toggle **System Settings → Appearance**. The next prompt in any WezTerm shell
-should swap palettes within ~3 seconds. If you want to force a refresh:
+Starship can't watch the OS, so a small zsh hook does it instead:
 
-```bash
-starship-resync
+1. On shell start, the hook writes two cache files from the main config,
+   one per palette (`~/.cache/starship-tokyo_night.toml` and
+   `~/.cache/starship-tokyo_night_day.toml`).
+2. Before each prompt it checks `defaults read -g AppleInterfaceStyle` and
+   points `STARSHIP_CONFIG` at the matching cache.
+3. That check only runs once every 3 seconds, so mashing enter doesn't
+   spawn a `defaults` process per prompt.
+
+Zellij can't change theme mid-session, so a `zellij` shell function picks
+dark or day at launch and points zellij at a cached copy of your
+`config.kdl` with the `theme` line swapped in. Your real config is never
+edited. A running session keeps whatever theme it started with; restart
+the session to pick up a change. If you'd rather not use the wrapper, set
+`theme "tokyo-night"` in `~/.config/zellij/config.kdl` yourself and skip
+the auto-pick.
+
+## What you get
+
+```
+tokyo-night-shell/
+├── bin/tokyo-night-shell        the CLI (init / uninstall / swap / mode)
+├── wezterm/wezterm.lua          WezTerm config
+├── starship/starship.toml       Starship config
+├── zellij/themes/               Zellij theme files (dark + day)
+└── shell/zshrc-init.zsh         zsh hook that swaps palettes on Appearance change
 ```
 
-## Customize
+### WezTerm
 
-| Want… | Edit |
+- Tokyo Night and Tokyo Night Day palettes, live-swapped on Appearance change
+- JetBrainsMono Nerd Font with ligatures
+- macOS vibrancy: 0.82 opacity with heavy background blur
+- Tab bar with Nerd Font process icons (nvim, git, node, python, docker,
+  and friends), a blue accent on the active tab, and wide click targets
+- Right status line showing workspace, battery, and clock
+- Mac-style keys: `⌘D` / `⌘⇧D` to split, `⌘⌥` + arrows to move between
+  panes, `⌘↵` to zoom, `⌘K` to clear, `⌘⇧P` for the command palette
+- Inactive panes dim slightly so the focused one stands out
+
+### Starship
+
+- Two-line prompt framed by `╭─` / `╰─` brackets
+- Per-language version colors (node green, rust orange, go cyan, and so on)
+- Compact git status with ahead/behind arrows
+- Current time on the right, dimmed
+- The `❯` turns red when the last command failed, and flips to a green `❮`
+  in vim normal mode if you use zsh-vi-mode
+
+The day palette here is darker than the official Tokyo Night Day. With
+vibrancy on, the wallpaper bleeds into the terminal background and the
+official colors wash out. These are tuned to stay readable through the blur.
+
+### Zellij
+
+Theme files for the pane frames, status bar, ribbons, and tables, matched
+to the WezTerm palettes. They use the newer Zellij styling schema (0.40+),
+so the whole UI is themed rather than just the base colors.
+
+## Commands
+
+| Command | What it does |
 |---|---|
-| Different mono font | `font.family` and `window_frame.font` in `wezterm/wezterm.lua` (must be a Nerd Font variant for tab icons) |
-| No vibrancy | `window_background_opacity = 1.0` and `macos_window_background_blur = 0` in `wezterm/wezterm.lua` |
-| Fewer prompt modules | Remove from the top-level `format = """ … """` in `starship/starship.toml` |
-| Tweak day-palette brightness | Values under `[palettes.tokyo_night_day]` in `starship/starship.toml` |
-| Adjust zellij colors | Hex values in `zellij/themes/tokyo-night.kdl` and `zellij/themes/tokyo-night-day.kdl` |
-| Less frequent appearance polling | Bump the `3` in `(( now - __starship_last_appearance_check < 3 ))` inside `shell/zshrc-init.zsh` |
-| Swap the focus accent (prompt ❯, active tab, Zellij ribbon) | See **Accent swap** below |
-| Force dark/day without changing macOS Appearance | `tokyo-night-shell mode dark` / `mode day` / `mode auto` (auto = follow the OS again) |
+| `tokyo-night-shell init` | Install or refresh everything in `$HOME` |
+| `tokyo-night-shell uninstall` | Restore backups and remove the `~/.zshrc` block |
+| `tokyo-night-shell swap <color>` | Change the focus accent color |
+| `tokyo-night-shell mode dark\|day\|auto` | Force dark or day without touching the OS setting |
 
-### Accent swap
+### Forcing a mode
 
-The "focus" color — used for the prompt `❯`, the WezTerm active tab, and
-Zellij's active ribbon + pane border — can be swapped to any palette color.
-
-**Quick path:**
+Sometimes you want a dark terminal on a light desktop:
 
 ```bash
-tokyo-night-shell swap orange         # change your installed configs only
-tokyo-night-shell swap --repo orange  # also rewrite the repo source (for a fork/PR)
+tokyo-night-shell mode dark    # terminal goes dark, macOS stays put
+tokyo-night-shell mode day     # the reverse ("light" works too)
+tokyo-night-shell mode auto    # follow the OS again
+tokyo-night-shell mode         # print the current setting
 ```
 
-Default target is just your installed dot files (`~/.wezterm.lua`,
-`~/.config/starship.toml`, `~/.config/zellij/themes/*.kdl`) — the source
-files in this repo stay untouched, so re-cloning or pulling upstream
-doesn't fight your accent choice. Caveat: re-running `tokyo-night-shell init`
-will copy the repo's accent back over your installed configs, so if you want
-your swap to survive an init you'll need `--repo` too (or to commit the
-source change to your own fork). The `--repo` flag is only available when
-running from a git clone — in a brew install, fork the tap to change the
-shipped default. Accepts `blue`, `cyan`, `magenta`, `green`, `yellow`,
-`red`, `orange`.
+WezTerm repaints immediately, Starship follows on the next prompt, and
+Zellij picks it up for new sessions.
 
-**Manual path** — three small edits, one per tool:
+### Changing the accent color
 
-- **WezTerm** (`wezterm/wezterm.lua`): change `local ACCENT_NAME = 'blue'` near
-  the top of the file to `'orange'`, `'magenta'`, `'green'`, `'cyan'`,
-  `'yellow'`, or `'red'`. Reloads live.
-- **Starship** (`starship/starship.toml`): change the `accent = "#..."` line
-  in each palette block — one in `[palettes.tokyo_night]`, one in
-  `[palettes.tokyo_night_day]`. Hex variants are listed in the comment above
-  the palettes. Run `starship-resync` to apply.
-- **Zellij** (`zellij/themes/tokyo-night.kdl` + `tokyo-night-day.kdl`): each
-  theme file has a "FOCUS ACCENT SWAP" comment at the top listing the two
-  hex lines to edit and the alternate values. Restart any running session
-  (`zellij ka && exec zsh`) to apply.
+The accent is the color used for the prompt `❯`, the active WezTerm tab,
+and Zellij's active ribbon and pane border. Blue by default. To change it:
 
-After editing any config in the package, re-run `tokyo-night-shell init`.
-After editing the installed configs directly (`~/.wezterm.lua`,
-`~/.config/starship.toml`, `~/.config/zellij/config.kdl`), run
-`starship-resync` or `zellij-resync` in your shell to rebuild the palette
-caches.
+```bash
+tokyo-night-shell swap orange
+```
+
+Choices: `blue`, `cyan`, `magenta`, `green`, `yellow`, `red`, `orange`.
+Each has a matching day-mode tint, so the accent survives light/dark
+switches.
+
+`swap` edits your installed dot files only (`~/.wezterm.lua`,
+`~/.config/starship.toml`, `~/.config/zellij/themes/*.kdl`). If you're
+working from a clone and want the change in the source too, say for a fork
+or a PR, add `--repo`. Note that re-running `init` copies the source accent
+back over your installed configs, so a swap without `--repo` won't survive
+an `init`.
+
+If you'd rather edit by hand: change `ACCENT_NAME` near the top of
+`wezterm.lua`, the `accent =` line in each palette block of
+`starship.toml`, and the two hex lines flagged by the "FOCUS ACCENT SWAP"
+comment in each Zellij theme file.
+
+## Customizing
+
+| To get… | Edit |
+|---|---|
+| A different mono font | `font.family` and `window_frame.font` in `wezterm/wezterm.lua` (needs a Nerd Font for the tab icons) |
+| No transparency | `window_background_opacity = 1.0` and `macos_window_background_blur = 0` in `wezterm/wezterm.lua` |
+| Fewer prompt modules | Remove entries from the `format` string in `starship/starship.toml` |
+| A brighter or darker day palette | Values under `[palettes.tokyo_night_day]` in `starship/starship.toml` |
+| Different Zellij colors | Hex values in `zellij/themes/*.kdl` |
+| Less frequent Appearance polling | The `3` in `__starship_pick_palette` inside `shell/zshrc-init.zsh` |
+
+After editing files in the repo, re-run `tokyo-night-shell init` to install
+them. After editing the installed configs directly, run `starship-resync`
+or `zellij-resync` to rebuild the caches.
 
 ## Uninstall
 
@@ -191,21 +193,21 @@ caches.
 tokyo-night-shell uninstall
 ```
 
-Restores the **most recent** timestamped backups of `~/.wezterm.lua` and
-`~/.config/starship.toml`, removes the managed block from `~/.zshrc`, and
-clears the Starship caches. Leaves WezTerm, Starship, and the font installed.
+This restores the most recent backups of `~/.wezterm.lua` and
+`~/.config/starship.toml`, removes the block from `~/.zshrc`, and deletes
+the Zellij themes and palette caches. WezTerm, Starship, and the font stay
+installed.
 
-## Limitations
+## Notes and limitations
 
-- **macOS only** for the auto-switch. The hook uses `defaults read -g
-  AppleInterfaceStyle`. On Linux it falls through to the day palette
-  permanently; patches to read `gsettings get … gtk-theme` / KDE equivalents
-  welcome.
-- **zsh only**. The Starship config itself works in bash/fish, but the
-  appearance hook is zsh-specific (uses `zsh/datetime` and `add-zsh-hook`).
-- **WezTerm only**. The WezTerm config uses APIs specific to that emulator.
-  The Starship half stands on its own in any terminal.
-- **Zellij themes apply at session start**. Zellij has no native theme
-  reload, so toggling Appearance during a running zellij session leaves the
-  theme unchanged until you restart that session. The shell wrapper picks
-  correctly for any *new* session.
+- **macOS only.** The auto-switch reads `defaults read -g
+  AppleInterfaceStyle`, which doesn't exist elsewhere. On Linux everything
+  stays on the day palette. If you want to port the hook,
+  `gsettings get org.gnome.desktop.interface gtk-theme` is probably the
+  place to start. PRs welcome.
+- **zsh only.** The Starship config itself works in bash and fish, but the
+  hook uses `zsh/datetime` and `add-zsh-hook`.
+- **WezTerm only.** The WezTerm config obviously won't port, though the
+  Starship half works in any terminal.
+- **Zellij themes apply at session start.** Zellij has no theme reload, so
+  a running session keeps its theme until you restart it.
