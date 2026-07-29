@@ -31,6 +31,9 @@ brew install packetthrower/tap/tokyo-night-shell
 tokyo-night-shell init
 ```
 
+Homebrew asks you to confirm the first time you install from a third-party
+tap. You can pre-approve it with `brew trust --tap packetthrower/tap`.
+
 Add `--HEAD` to the install if you want the latest commit on `main` instead
 of the last tagged release.
 
