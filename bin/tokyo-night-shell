@@ -4,7 +4,7 @@
 # https://github.com/packetThrower/tokyo-night-shell
 set -euo pipefail
 
-VERSION="0.1.0"
+VERSION="0.2.0"
 
 # ─── Locate resources ────────────────────────────────────────────────────────
 # Source configs (wezterm.lua, starship.toml, zellij themes, shell hook) live
